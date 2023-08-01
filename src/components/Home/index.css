@@ -1,0 +1,31 @@
+.home-container {
+  height: 100vh;
+  background-image: url('https://crowdfunding-platforms.com/wp-content/uploads/2021/03/13-P2P-banking-model-1024x575.jpg');
+  background-size: cover;
+  padding: 40px;
+}
+.card {
+  height: 60vh;
+  width: 300px;
+  padding: 1s0px;
+  background-color: #ffffff;
+  border-radius: 20px;
+  margin-top: 70px;
+}
+.heading {
+  color: red;
+  font-family: serif;
+  text-align: center;
+  padding-top: 20px;
+}
+.none {
+  text-decoration: none;
+  margin-top: 20px;
+}
+
+.list {
+  color: black;
+  text-decoration: underline;
+  font-weight: bold;
+  margin-top: 40px;
+}

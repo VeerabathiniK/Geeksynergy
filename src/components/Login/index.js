@@ -1,265 +1,92 @@
-import {Link} from 'react-router-dom'
-
 import {Component} from 'react'
+
+import cookies from 'js-cookies'
+import {Link} from 'react-router-dom'
 
 import './index.css'
 
 class Login extends Component {
-  state = {
-    firstNameInput: '',
-    lastNameInput: '',
-    email: '',
-    number: '',
-    showFirstNameError: false,
-    showLastNameError: false,
-    showEmailError: false,
-    showNumberError: false,
-    isFormSubmitted: false,
+  state = {username: '', password: '', showSubmitError: false, errorMsg: ''}
+
+  onChangeUsername = event => {
+    this.setState({username: event.target.value})
   }
 
-  onBlurLastName = () => {
-    const isValidLastName = this.validateLastName()
-
-    this.setState({showLastNameError: !isValidLastName})
+  onChangePassword = event => {
+    this.setState({password: event.target.value})
   }
 
-  onChangeLastName = event => {
-    const {target} = event
-    const {value} = target
-
-    this.setState({
-      lastNameInput: value,
-    })
+  OnSubmitSuccess = JwtToken => {
+    const {history} = this.props
+    cookies.set('jwt_token', JwtToken, {expires: 30, path: '/'})
+    history.replace('/')
   }
 
-  onChangeEmail = event => {
-    const {target} = event
-    const {value} = target
-    this.setState({email: value})
+  onFailure = errorMsg => {
+    this.setState({showSubmitError: true, errorMsg})
   }
 
-  onChangeNumber = event => {
-    const {target} = event
-    const {value} = target
-    this.setState({number: value})
-  }
-
-  renderPasswordField = () => {
-    const {lastNameInput, showLastNameError} = this.state
-    const className = showLastNameError
-      ? 'name-input-field error-field'
-      : 'name-input-field'
-
-    return (
-      <div className="input-container">
-        <label className="input-label" htmlFor="lastName">
-          PASSWORD
-        </label>
-        <input
-          type="password"
-          id="lastName"
-          className={className}
-          value={lastNameInput}
-          placeholder="Enter the password"
-          onChange={this.onChangeLastName}
-          onBlur={this.onBlurLastName}
-        />
-      </div>
-    )
-  }
-
-  onBlurFirstName = () => {
-    const isValidFirstName = this.validateFirstName()
-
-    this.setState({showFirstNameError: !isValidFirstName})
-  }
-
-  onChangeFirstName = event => {
-    const {target} = event
-    const {value} = target
-
-    this.setState({
-      firstNameInput: value,
-    })
-  }
-
-  renderFirstNameField = () => {
-    const {firstNameInput, showFirstNameError} = this.state
-    const className = showFirstNameError
-      ? 'name-input-field error-field'
-      : 'name-input-field'
-
-    return (
-      <div className="input-container">
-        <label className="input-label" htmlFor="firstName">
-          NAME
-        </label>
-        <input
-          type="text"
-          id="firstName"
-          className={className}
-          value={firstNameInput}
-          placeholder="Enter the name"
-          onChange={this.onChangeFirstName}
-          onBlur={this.onBlurFirstName}
-        />
-      </div>
-    )
-  }
-
-  renderEmailField = () => {
-    const {email, showEmailError} = this.state
-    const className = showEmailError
-      ? 'name-input-field error-field'
-      : 'name-input-field'
-    return (
-      <div className="input-container">
-        <label className="input-label" htmlFor="emailAddress">
-          EMAIL
-        </label>
-        <input
-          id="emailAddress"
-          type="email"
-          className={className}
-          value={email}
-          onChange={this.onChangeEmail}
-          placeholder="Enter the Email"
-        />
-      </div>
-    )
-  }
-
-  renderNumberField = () => {
-    const {number, showNumberError} = this.state
-    const className = showNumberError
-      ? 'name-input-field error-field'
-      : 'name-input-field'
-    return (
-      <div className="input-container">
-        <label className="input-label" htmlFor="mobile">
-          Number
-        </label>
-        <input
-          id="mobile"
-          type="number"
-          className={className}
-          value={number}
-          onChange={this.onChangeNumber}
-          placeholder="Enter the Number"
-        />
-      </div>
-    )
-  }
-
-  validateLastName = () => {
-    const {lastNameInput} = this.state
-
-    return lastNameInput !== ''
-  }
-
-  validateFirstName = () => {
-    const {firstNameInput} = this.state
-
-    return firstNameInput !== ''
-  }
-
-  validEmail = () => {
-    const {email} = this.state
-    return email !== ''
-  }
-
-  validNumber = () => {
-    const {number} = this.state
-    return number !== ''
-  }
-
-  onSubmitForm = event => {
+  onSubmitLoginForm = async event => {
     event.preventDefault()
-    const isValidFirstName = this.validateFirstName()
-    const isValidLastName = this.validateLastName()
-    const isValidEmail = this.validEmail()
-    const isValidNumber = this.validNumber()
+    const {username, password} = this.state
+    const userDetails = {username, password}
 
-    if (isValidFirstName && isValidLastName && isValidEmail && isValidNumber) {
-      this.setState({isFormSubmitted: true})
+    const LoginUrl =
+      'https://bursting-gelding-24.hasura.app/api/rest/get-user-id'
+    const options = {
+      method: 'POST',
+      body: JSON.stringify(userDetails),
+    }
+    const response = await fetch(LoginUrl, options)
+    const data = await response.json()
+    if (response.ok === true) {
+      this.OnSubmitSuccess(data.jwt_token)
     } else {
-      this.setState({
-        showFirstNameError: !isValidFirstName,
-        showLastNameError: !isValidLastName,
-        showEmailError: !isValidEmail,
-        showNumberError: !isValidNumber,
-        isFormSubmitted: false,
-      })
+      this.onFailure(data.error_msg)
     }
   }
 
-  renderRegistrationForm = () => {
-    const {
-      showFirstNameError,
-      showLastNameError,
-      showEmailError,
-      showNumberError,
-    } = this.state
-
-    return (
-      <form className="form-container" onSubmit={this.onSubmitForm}>
-        {this.renderFirstNameField()}
-        {showFirstNameError && <p className="error-message">Required</p>}
-        {this.renderEmailField()}
-        {showLastNameError && <p className="error-message">Required</p>}
-        {this.renderPasswordField()}
-        {showEmailError && <p className="error-message">Required</p>}
-        {this.renderNumberField()}
-        {showNumberError && <p className="error-message">Required</p>}
-        <Link to="/">
-          <button type="submit" className="submit-button">
-            Submit
-          </button>
-        </Link>
-      </form>
-    )
-  }
-
-  onClickSubmitAnotherResponse = () => {
-    this.setState(prevState => ({
-      isFormSubmitted: !prevState.isFormSubmitted,
-      firstNameInput: '',
-      lastNameInput: '',
-    }))
-  }
-
-  renderSubmissionSuccessView = () => (
-    <>
-      <img
-        src="https://assets.ccbp.in/frontend/react-js/success-icon-img.png"
-        alt="success"
-        className="success-image"
-      />
-      <p>Submitted Successfully</p>
-      <button
-        type="button"
-        className="submit-button"
-        onClick={this.onClickSubmitAnotherResponse}
-      >
-        Submit Another Response
-      </button>
-    </>
-  )
-
   render() {
-    const {isFormSubmitted} = this.state
+    const {username, password, showSubmitError, errorMsg} = this.state
 
     return (
-      <div className="registration-form-container">
-        <h1 className="form-title">MOVIES LIST</h1>
-        <div className="view-container">
-          {isFormSubmitted
-            ? this.renderSubmissionSuccessView()
-            : this.renderRegistrationForm()}
-        </div>
+      <div className="app-container">
+        <form className="login-container" onSubmit={this.onSubmitLoginForm}>
+          <div className="username-container">
+            <label className="label-username" htmlFor="emailAddress">
+              EMAIL
+            </label>
+            <input
+              id="emailAddress"
+              className="input-username"
+              value={username}
+              onChange={this.onChangeUsername}
+              type="email"
+              placeholder="Please enter email"
+            />
+          </div>
+          <div className="username-container">
+            <label className="label-username" htmlFor="passwordA">
+              PASSWORD
+            </label>
+            <input
+              id="passwordA"
+              className="input-username"
+              value={password}
+              onChange={this.onChangePassword}
+              type="password"
+              placeholder="please enter password"
+            />
+          </div>
+          <Link to="/">
+            <button className="login-button" type="submit">
+              Login
+            </button>
+          </Link>
+          {showSubmitError && <p className="error-msg">* {errorMsg}</p>}
+        </form>
       </div>
     )
   }
 }
-
 export default Login

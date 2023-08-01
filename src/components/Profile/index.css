@@ -1,0 +1,49 @@
+.profile-container {
+  padding: 30px;
+}
+.heading-profile {
+  color: #343c6a;
+  font-family: Inter;
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+.main-container {
+  display: flex;
+  flex-direction: row;
+  margin-left: 40px;
+}
+.profile-pic {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  border-radius: 80px;
+}
+.name-container {
+  display: flex;
+  flex-direction: column;
+  margin-left: 40px;
+}
+.p1 {
+  color: #505887;
+  font-family: Inter;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  margin-left: 20px;
+}
+.input1 {
+  margin-left: 20px;
+}
+.username-container-main {
+  margin-left: 200px;
+}
+.logout-button {
+  margin-left: 450px;
+  background-color: red;
+  color: #ffffff;
+  border: none;
+  padding: 5px;
+}
